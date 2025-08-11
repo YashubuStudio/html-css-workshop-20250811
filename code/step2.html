@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ステップ2：反射神経ゲーム</title>
+  <style>
+    body{font-family: system-ui, sans-serif; display:grid; place-items:center; height:100vh; margin:0; background:#eaf6ff}
+    .panel{background:#fff; padding:24px; border-radius:16px; box-shadow:0 6px 18px rgba(0,0,0,.08); text-align:center; width:min(640px, 90vw)}
+    .big{font-size:48px; margin:16px 0}
+    button{font-size:18px; padding:12px 20px; border-radius:12px; border:none; cursor:pointer; background:#059669; color:#fff}
+  </style>
+</head>
+<body>
+  <div class="panel">
+    <h1>反射神経ゲーム</h1>
+    <p>スタート→「今！」が出たらすぐクリック！早すぎるクリックはフライング。</p>
+    <div class="big" id="state">準備OK？</div>
+    <div id="result">—</div>
+    <button id="start">スタート</button>
+  </div>
+
+  <script>
+    const stateEl = document.getElementById('state');
+    const resultEl = document.getElementById('result');
+    const startBtn = document.getElementById('start');
+
+    let waiting = false; // 「今！」待ち中か？
+    let readyTimer = null;
+    let startTime = 0;
+
+    startBtn.addEventListener('click', () => {
+      startBtn.disabled = true;
+      stateEl.textContent = '…まって…';
+      resultEl.textContent = '—';
+      const delay = 1000 + Math.random() * 3000; // 1〜4秒
+      readyTimer = setTimeout(() => {
+        stateEl.textContent = '今！クリック！';
+        waiting = true;
+        startTime = performance.now();
+      }, delay);
+    });
+
+    document.addEventListener('click', (e) => {
+      // スタートボタン自体のクリックは無視
+      if (e.target === startBtn) return;
+      if (!startBtn.disabled) return; // ゲーム中でない
+      if (!waiting) {
+        // まだ「今！」じゃない
+        clearTimeout(readyTimer);
+        stateEl.textContent = 'フライング！';
+        startBtn.disabled = false;
+      } else {
+        const t = Math.round(performance.now() - startTime);
+        stateEl.textContent = '結果';
+        resultEl.textContent = t + ' ms';
+        waiting = false;
+        startBtn.disabled = false;
+      }
+    }, {capture:true});
+  </script>
+</body>
+</html>
