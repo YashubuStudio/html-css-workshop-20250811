@@ -1,6 +1,7 @@
 # 楽しくゲームを作りながら、覚える — HTML/CSS/JS入門（5ステップ）
 
 子ども向け・初心者向けに、**実際に動くページ**を作りながらHTML/CSS/JavaScript（JS）を学ぶ教材です。テーマは「**実際のコーディングと問題を考えて楽しく解く**」。最終的には**簡単なポートフォリオ**として成果をまとめます。
+※RaspberryPi 4B や RaspberryPi 5、Ubuntu等は、Linuxとして一括りにまとめて説明します。操作方法は基本的に同じです。
 
 ---
 
@@ -13,9 +14,9 @@
 
 ## 用意するもの
 
-* パソコン（Windows/Mac/Chromebook/Raspberry PiどれでもOK）
-* エディタ（メモ帳でも可。おすすめ：**VS Code**）
-* ブラウザ（Chrome/Safari/Edgeなど）
+* パソコン：Windows/Mac/Chromebook/Linux（RaspberryPi等）どれでもOK
+* エディタ：メモ帳でも可。おすすめ：**VS Code**
+* ブラウザ：Chrome/Safari/Edgeなど
 
 ## はじめての人のためのHow To Use（開き方・コードの見方・直し方）
 
@@ -25,23 +26,25 @@
 
 1. 好きな場所にフォルダを作る（例：`portfolio/step1/`）。
 2. フォルダの中に**新しいファイル**を作って、名前を\*\*`index.html`\*\*にする。
-3. 教材のコードを**まるごとコピペ**して`index.html`に貼り付け、**保存**（Windows/Chromebook/Raspberry Piは`Ctrl + S`、Macは`⌘ + S`）。
+3. 教材のコードを**まるごとコピペ**して`index.html`に貼り付け、**保存**（Windows/Chromebook/Linuxは`Ctrl + S`、Macは`⌘ + S`）。
 4. フォルダで`index.html`を**ダブルクリック** → ブラウザ（Chrome/Safari/Edgeなど）で開く。
-5. 直したいときは再び保存して、ブラウザを**更新**（`F5` / `Ctrl + R`（Windows/Chromebook/Raspberry Pi）/ `⌘ + R`（Mac））。
+5. 直したいときは再び保存して、ブラウザを**更新**（`F5` / `Ctrl + R`（Windows/Chromebook/Linux）/ `⌘ + R`（Mac））。
 
 > **ポイント**：作業は「エディタで書く → 保存 → ブラウザで見る → 更新」のくり返し。
 
 ### 2) エディタの選び方（メモ帳でもOK）
 
-* いちばん簡単：**メモ帳 / TextEdit**（Macは“標準テキスト”に設定、Raspberry Piは標準の「テキストエディタ」でOK）
+* いちばん簡単：**メモ帳 / TextEdit**（Macは“標準テキスト”に設定、Linuxは標準の「テキストエディタ」でOK）
 * おすすめ：**VS Code**（無料）。`File > Open Folder`でプロジェクトのフォルダごと開くと迷子になりにくい。
+* どこでも使える：**nano** `sudo nano ~~~`でファイルを指定して開く。`Ctrl + X`,`Y`,`Enter`の順で保存して閉じる。覚えておくと便利
 
 ### 3) OS別・新規ファイルの作り方ミニガイド
 
 * **Windows**：エクスプローラーで右クリック → 新規作成 → テキストドキュメント → 名前を`index.html`に。拡張子が見えないときは「表示 → 表示/非表示 → **ファイル名拡張子**」にチェック。
 * **Mac**：TextEditを開く → 環境設定で「**標準テキスト**」に → 新規作成 → `index.html`として保存。拡張子が`.txt`にならないよう注意。
 * **Chromebook**：ファイルアプリまたはテキストエディタで新規作成 → `index.html`として保存 → Chromeで開く。
-* **Raspberry Pi**：ファイルマネージャで右クリック → 新規作成 → 空のファイル → 名前を`index.html`にして保存。テキストエディタで開いて編集。
+* **Linux**：ファイルマネージャで右クリック → 新規作成 → 空のファイル → 名前を`index.html`にして保存。テキストエディタで開いて編集。
+* **terminal**：作りたいディレクトリ（フォルダのある場所）に移動（`cd ~/flder_name`）し、`sudo nano index.html`で新しいファイルに書き込み。既存の`index.html`がある場合は、それが開かれるので注意。（コピーの方法：`cp index.html index2.html` `cp [コピー元] [コピー後]`）
 
 ### 4) コードの“見方・参照の仕方”超入門
 
@@ -77,7 +80,7 @@
 
 ### 7) つまずいたらチェック（おとな向けオプション）
 
-* **開発者ツール**のコンソールを見る：`F12`（Windows/Chromebook/Raspberry Pi）/ `⌥⌘I`（Mac）。赤いエラー行の**行番号**をクリック → その行を直す。
+* **開発者ツール**のコンソールを見る：`F12`（Windows/Chromebook/Linux）/ `⌥⌘I`（Mac）。赤いエラー行の**行番号**をクリック → その行を直す。
 * 文字化けは`<meta charset="utf-8">`を最上部の`<head>`内に。
 
 ### 8) 安全に試すコツ
@@ -96,4 +99,4 @@
 
 ### ライセンス
 
-この教材は個人学習・学校授業で自由に使ってOKです（クレジット表記推奨："Made with ❤️ + HTML/CSS/JS"）。
+この教材は個人学習・学校授業で自由に使ってOKです（クレジット表記推奨：YashubuStudio / "Made with ❤️ + HTML/CSS/JS" / 2025）。
