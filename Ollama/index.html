@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Ollama Minimal Web Client</title>
+<style>
+  :root{--fg:#0f172a;--muted:#64748b;--bg:#f8fafc;--card:#fff;--border:#e2e8f0}
+  *{box-sizing:border-box} body{margin:0;padding:20px;font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;color:var(--fg);background:var(--bg)}
+  .wrap{max-width:900px;margin:0 auto;display:grid;gap:12px}
+  .card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px}
+  label{font-size:12px;color:var(--muted);display:block;margin:6px 0}
+  input,textarea,button{font:inherit;width:100%} textarea{min-height:140px;resize:vertical}
+  input,textarea{padding:10px 12px;border:1px solid var(--border);border-radius:10px;background:#fff}
+  .row{display:grid;gap:10px}
+  .controls{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:8px}
+  .btn{padding:10px 14px;border-radius:10px;border:1px solid var(--border);cursor:pointer}
+  .primary{background:#111827;color:#fff} .secondary{background:#fff;color:#111827}
+  pre{white-space:pre-wrap;word-wrap:break-word;background:#0b1020;color:#e5e7eb;padding:12px;border-radius:10px;max-height:60vh;overflow:auto}
+  .hint{font-size:12px;color:var(--muted)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="card">
+    <h1 style="margin:0 0 6px">Ollama Minimal Web Client</h1>
+    <div class="hint">
+      同一Originの <code>/api</code> にリバースプロキシしている想定です。<br>
+      直接つなぐ場合は Endpoint に <code>http://ラズパイのIP:11434/api</code> を入力してください（CORS注意）。
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="row">
+      <div>
+        <label>Endpoint（Ollamaを起動しているRaspberryPi5で開いている場合は、空でOK）</label>
+        <input id="endpoint" placeholder="http://<PiのIP>:11434/api" />
+      </div>
+      <div>
+        <label>Prompt</label>
+        <textarea id="prompt" placeholder="Raspberry Piで自己紹介して"></textarea>
+      </div>
+    </div>
+
+    <div class="controls">
+      <button id="run" class="btn primary">Generate</button>
+      <button id="stop" class="btn secondary">Abort</button>
+      <label class="hint"><input id="stream" type="checkbox" checked /> stream</label>
+    </div>
+  </div>
+
+  <div class="card">
+    <label>Output</label>
+    <pre id="out"></pre>
+    <div class="hint">Streaming時はNDJSON（1行ずつJSON）を逐次読みます。</div>
+  </div>
+</div>
+
+<script>
+  // ★ ここで使うモデル名を固定します（UIからは変更しません）
+  const MODEL = 'yuiseki/sarashina2.2:1b'; // 例: 'gemma3:1b' に変える場合はここだけ直す
+
+  const $ = s => document.querySelector(s);
+  const out = $('#out');
+  let controller = null;
+
+  const apiBase = () => {
+    const ep = $('#endpoint').value.trim();
+    return ep ? ep.replace(/\/$/, '') : '/api';
+  };
+
+  const print = t => { out.textContent += t; out.scrollTop = out.scrollHeight; };
+  const clear = () => out.textContent = '';
+
+  async function generate() {
+    // 既存のリクエストがあれば止める
+    if (controller) controller.abort();
+    controller = new AbortController();
+
+    clear();
+
+    const prompt = $('#prompt').value.trim() || 'こんにちは！';
+    const stream = $('#stream').checked;
+    const url = apiBase() + '/generate';
+    const body = { model: MODEL, prompt, stream };
+
+    try {
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+        signal: controller.signal
+      });
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+
+      if (!stream) {
+        const data = await res.json();
+        print(data.response || JSON.stringify(data));
+        return;
+      }
+
+      // Streaming（NDJSON）を1行ずつ処理
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder();
+      let buf = '';
+      while (true) {
+        const { value, done } = await reader.read();
+        if (done) break;
+        buf += decoder.decode(value, { stream: true });
+        let nl;
+        while ((nl = buf.indexOf('\n')) >= 0) {
+          const line = buf.slice(0, nl).trim();
+          buf = buf.slice(nl + 1);
+          if (!line) continue;
+          try {
+            const obj = JSON.parse(line);
+            if (obj.response) print(obj.response);
+          } catch { /* JSON途中の欠片は無視 */ }
+        }
+      }
+    } catch (e) {
+      print('\n[Error] ' + e.message);
+    } finally {
+      controller = null;
+    }
+  }
+
+  $('#run').addEventListener('click', generate);
+  $('#stop').addEventListener('click', () => controller?.abort());
+</script>
+</body>
+</html>
